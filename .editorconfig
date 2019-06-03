@@ -1,0 +1,16 @@
+# EditorConfig is awesome: http://EditorConfig.org
+
+# top-most EditorConfig file
+root = true
+
+[*]
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = false
+indent_style = space
+indent_size = 2
+max_line_length = 120
+insert_final_newline = false
+
+[*.{md,markdown}]
+trim_trailing_whitespace = false
