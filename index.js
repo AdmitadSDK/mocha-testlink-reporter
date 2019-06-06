@@ -26,23 +26,23 @@ class TestLinkReporter extends mocha.reporters.Spec {
         this.testplanid = this.createTestPlan()
       })
       .on(EVENT_SUITE_END, suite =>
-        this.publishTestResults(suite, caseId => this.suiteOptions(caseId, suite))
+        this.publishTestResults(suite.title, caseId => this.suiteOptions(caseId, suite))
       )
       .on(EVENT_TEST_PASS, test =>
-        this.publishTestResults(test, caseId => this.tcOptions(caseId, test.duration))
+        this.publishTestResults(test.title, caseId => this.tcOptions(caseId, test.duration))
       )
       .on(EVENT_TEST_FAIL, (test, err) =>
-        this.publishTestResults(test, caseId => this.tcOptions(caseId, test.duration, err))
+        this.publishTestResults(test.title, caseId => this.tcOptions(caseId, test.duration, err))
       )
   }
 
   /**
    * Extracts test status and publishes the result to TestLink.
-   * @param {Test|Suite} testObj with execution results
+   * @param {string} title of the test to extract case ids from
    * @param {Function} optionsGen returns options based on caseId
    */
-  publishTestResults (testObj, optionsGen) {
-    for (const caseId of this.titleToCaseIds(testObj.title)) {
+  publishTestResults (title, optionsGen) {
+    for (const caseId of this.titleToCaseIds(title)) {
       const options = optionsGen(caseId)
       this.promiseChain = this.promiseChain.then(() => this.testlink.reportTCResult(options)).catch(console.error)
     }
