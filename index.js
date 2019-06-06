@@ -22,6 +22,9 @@ class TestLinkReporter extends mocha.reporters.Spec {
 
     this.buildid = 1
 
+    // The chain is used to report test statuses in the order they become available during execution
+    // An alternative would be to collect the statuses and publish them in one go at the end, but
+    // they would be lost if the execution is aborted or the system crashes
     this.promiseChain = this.testlink.checkDevKey().catch(console.error)
 
     runner
@@ -40,7 +43,7 @@ class TestLinkReporter extends mocha.reporters.Spec {
   }
 
   /**
-   * Extracts test status and publishes the result to TestLink.
+   * Updates the TestLink status of each case id mentioned in the supplied title.
    * @param {string} title of the test to extract case ids from
    * @param {Function} optionsGen returns options based on caseId
    */
