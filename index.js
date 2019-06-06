@@ -9,15 +9,14 @@ const {
   EVENT_SUITE_END
 } = mocha.Runner.constants
 
-// this reporter outputs test results, indenting two spaces per suite
 class TestLinkReporter extends mocha.reporters.Spec {
   constructor (runner, options) {
     super(runner, options)
 
     const testlink = new TestLink({
       host: 'localhost',
-      port: 80, // Set if you are not using default port
-      secure: false, // Use https, if you are using http, set to false.
+      port: 80,
+      secure: false,
       apiKey: '6bfa04dbfbc5463925786ef48d1793d4' // The API KEY from TestLink. Get it from user profile.
     })
 
@@ -29,14 +28,7 @@ class TestLinkReporter extends mocha.reporters.Spec {
     runner
       .on(EVENT_SUITE_END, suite => {
         if (suite.title.length > 0) {
-          const options = {
-            testcaseexternalid: 'XPJ-2',
-            testplanid: 14,
-            status: suite.tests.some(t => t.state === 'failed') ? ExecutionStatus.FAILED : ExecutionStatus.PASSED,
-            buildid: 1,
-            execduration: suite.tests.reduce((acc, t) => acc + t.duration, 0) / 60000,
-            steps: []
-          }
+          const options = this.suiteOptions('XPJ-2', suite)
           promiseChain = promiseChain.then(() => testlink.reportTCResult(options)).catch(console.error)
         }
       })
@@ -52,6 +44,27 @@ class TestLinkReporter extends mocha.reporters.Spec {
           promiseChain = promiseChain.then(() => testlink.reportTCResult(options)).catch(console.error)
         }
       })
+  }
+
+  /**
+   * Generates the options for a TestLink case+steps that are mapped to mocha test suite+tests
+   * @param {string} testcaseexternalid e.g. XPJ-112
+   * @param {Suite} suite that is mapped to a TestLink test case
+   */
+  suiteOptions (testcaseexternalid, suite) {
+    // the suite is failed if any of its tests failed
+    const status = suite.tests.some(t => t.state === 'failed') ? ExecutionStatus.FAILED : ExecutionStatus.PASSED
+    // the sum total duration of the constituent tests
+    const execduration = suite.tests.reduce((acc, t) => acc + t.duration, 0) / 60000
+
+    return {
+      testcaseexternalid,
+      testplanid: this.testplanid,
+      status,
+      buildid: this.buildid,
+      execduration,
+      steps: []
+    }
   }
 
   /**
