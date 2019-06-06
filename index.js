@@ -1,4 +1,5 @@
 'use strict'
+
 const TestLink = require('testlink-xmlrpc')
 const { ExecutionStatus } = require('testlink-xmlrpc/lib/constants')
 
@@ -53,6 +54,7 @@ class TestLinkReporter extends mocha.reporters.Spec {
    * @returns {TestLink} object
    */
   establishTestLinkConnection (options) {
+    // TODO: extract data from options
     return new TestLink({
       host: 'localhost',
       port: 80,
@@ -103,7 +105,7 @@ class TestLinkReporter extends mocha.reporters.Spec {
       status,
       buildid: this.buildid,
       execduration,
-      steps: []
+      steps: [] // TODO: set the status of child steps
     }
   }
 
