@@ -4,8 +4,7 @@
   "description": "A custom mocha reporter for TestLink",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --reporter index.js",
-    "test2": "mocha"
+    "test": "mocha --reporter index.js --reporter-options URL=http://localhost,apiKey=6bfa04dbfbc5463925786ef48d1793d4,buildid=1"
   },
   "repository": {
     "type": "git",

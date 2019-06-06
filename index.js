@@ -18,9 +18,14 @@ class TestLinkReporter extends mocha.reporters.Spec {
   constructor (runner, options) {
     super(runner, options)
 
-    this.testlink = this.establishTestLinkConnection(options)
+    const reporterOptions = options.reporterOptions
+    for (const opt of ['URL', 'apiKey', 'buildid']) {
+      this.validateReporterOption(reporterOptions, opt)
+    }
 
-    this.buildid = 1
+    this.testlink = this.establishTestLinkConnection(reporterOptions)
+
+    this.buildid = reporterOptions.buildid
 
     // The chain is used to report test statuses in the order they become available during execution
     // An alternative would be to collect the statuses and publish them in one go at the end, but
@@ -56,17 +61,26 @@ class TestLinkReporter extends mocha.reporters.Spec {
 
   /**
    * Builds a connection object based on the parameters specified in the command line.
-   * @param {object} options passed to the reporter from the command line
+   * @param {object} options passed in --reporter-options command-line parameter
    * @returns {TestLink} object
    */
   establishTestLinkConnection (options) {
-    // TODO: extract data from options
+    const url = new URL(options.URL)
     return new TestLink({
-      host: 'localhost',
-      port: 80,
-      secure: false,
-      apiKey: '6bfa04dbfbc5463925786ef48d1793d4' // The API KEY from TestLink. Get it from user profile.
+      host: url.hostname,
+      port: url.port,
+      secure: url.protocol === 'https:',
+      apiKey: options.apiKey
     })
+  }
+
+  validateReporterOption (options, name) {
+    if (!options) {
+      throw new Error('Missing --reporter-options')
+    }
+    if (!options[name]) {
+      throw new Error(`Missing ${name} option in --reporter-options`)
+    }
   }
 
   /**
