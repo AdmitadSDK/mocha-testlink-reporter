@@ -88,16 +88,25 @@ class TestLinkReporter extends mocha.reporters.Spec {
   }
 
   /**
-   * Generates the options for a TestLink case+steps that are mapped to mocha test suite+tests
+   * Generates the options for a TestLink case with steps that are mapped to a mocha suite with tests
    * @param {string} testcaseexternalid e.g. XPJ-112
    * @param {Suite} suite that is mapped to a TestLink test case
    * @returns {object} with test suite options
    */
   suiteOptions (testcaseexternalid, suite) {
     // the suite is failed if any of its tests failed
-    const status = suite.tests.some(t => t.state === 'failed') ? ExecutionStatus.FAILED : ExecutionStatus.PASSED
+    const status = suite.tests.some(t => t.state !== 'passed') ? ExecutionStatus.FAILED : ExecutionStatus.PASSED
+
     // the sum total duration of the constituent tests
     const execduration = suite.tests.reduce((acc, t) => acc + t.duration, 0) / 60000
+
+    // collect the statuses of the constituent tests
+    const steps = suite.tests.map((t, idx) => {
+      return {
+        step_number: idx + 1,
+        result: t.state !== 'passed' ? ExecutionStatus.FAILED : ExecutionStatus.PASSED,
+        notes: t.err ? t.err.stack : '' }
+    })
 
     return {
       testcaseexternalid,
@@ -105,7 +114,7 @@ class TestLinkReporter extends mocha.reporters.Spec {
       status,
       buildid: this.buildid,
       execduration,
-      steps: [] // TODO: set the status of child steps
+      steps
     }
   }
 
