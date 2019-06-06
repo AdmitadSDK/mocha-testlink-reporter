@@ -4,6 +4,7 @@ const { ExecutionStatus } = require('testlink-xmlrpc/lib/constants')
 
 const mocha = require('mocha')
 const {
+  EVENT_RUN_BEGIN,
   EVENT_TEST_FAIL,
   EVENT_TEST_PASS,
   EVENT_SUITE_END
@@ -20,30 +21,47 @@ class TestLinkReporter extends mocha.reporters.Spec {
       apiKey: '6bfa04dbfbc5463925786ef48d1793d4' // The API KEY from TestLink. Get it from user profile.
     })
 
-    this.testplanid = 14
     this.buildid = 1
 
     let promiseChain = testlink.checkDevKey().catch(console.error)
 
     runner
+      .once(EVENT_RUN_BEGIN, () => {
+        // TODO: create a new test plan in TestLink
+        this.testplanid = 14
+      })
       .on(EVENT_SUITE_END, suite => {
-        if (suite.title.length > 0) {
-          const options = this.suiteOptions('XPJ-2', suite)
+        for (const caseId of this.titleToCaseIds(suite.title)) {
+          const options = this.suiteOptions(caseId, suite)
           promiseChain = promiseChain.then(() => testlink.reportTCResult(options)).catch(console.error)
         }
       })
       .on(EVENT_TEST_PASS, test => {
-        if (test.title.length > 0) {
-          const options = this.tcOptions('XPJ-1', test.duration)
+        for (const caseId of this.titleToCaseIds(test.title)) {
+          const options = this.tcOptions(caseId, test.duration)
           promiseChain = promiseChain.then(() => testlink.reportTCResult(options)).catch(console.error)
         }
       })
       .on(EVENT_TEST_FAIL, (test, err) => {
-        if (test.title.length > 0) {
-          const options = this.tcOptions('XPJ-2', test.duration, err)
+        for (const caseId of this.titleToCaseIds(test.title)) {
+          const options = this.tcOptions(caseId, test.duration, err)
           promiseChain = promiseChain.then(() => testlink.reportTCResult(options)).catch(console.error)
         }
       })
+  }
+
+  /**
+   * Extracts TestLink ids of the form [XPJ-112]. A single case (title) may have several ids specified.
+   * @param {string} title of the test case
+   */
+  titleToCaseIds (title) {
+    const caseIds = []
+    const re = /\[(\w+-\d+)\]/g
+
+    for (const match of title.matchAll(re)) {
+      caseIds.push(match[1])
+    }
+    return caseIds
   }
 
   /**

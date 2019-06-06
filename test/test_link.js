@@ -1,15 +1,9 @@
 'use strict'
 
-describe('good stuff', function () {
+describe('[XPJ-2] good stuff', function () {
   it('goes to hell', function () {
 
   })
-
-  // describe('', function () {
-  //   it('inside job', function () {
-
-  //   })
-  // })
 
   it('invoke the devil', async function () {
     throw Error('there be dragons here')
@@ -17,5 +11,15 @@ describe('good stuff', function () {
 
   it('but he may cry', async function () {
 
+  })
+})
+
+describe('here comes santa', function () {
+  it('[XPJ-1] inside job', function () {
+
+  })
+
+  it('[XPJ-3] stranger in a strange land', function () {
+    throw Error('etrange')
   })
 })
