@@ -14,12 +14,7 @@ class TestLinkReporter extends mocha.reporters.Spec {
   constructor (runner, options) {
     super(runner, options)
 
-    const testlink = new TestLink({
-      host: 'localhost',
-      port: 80,
-      secure: false,
-      apiKey: '6bfa04dbfbc5463925786ef48d1793d4' // The API KEY from TestLink. Get it from user profile.
-    })
+    const testlink = this.establishTestLinkConnection(options)
 
     this.buildid = 1
 
@@ -27,8 +22,7 @@ class TestLinkReporter extends mocha.reporters.Spec {
 
     runner
       .once(EVENT_RUN_BEGIN, () => {
-        // TODO: create a new test plan in TestLink
-        this.testplanid = 14
+        this.testplanid = this.createTestPlan()
       })
       .on(EVENT_SUITE_END, suite => {
         for (const caseId of this.titleToCaseIds(suite.title)) {
@@ -51,8 +45,32 @@ class TestLinkReporter extends mocha.reporters.Spec {
   }
 
   /**
+   * Builds a connection object based on the parameters specified in the command line.
+   * @param {object} options passed to the reporter from the command line
+   * @returns {TestLink} object
+   */
+  establishTestLinkConnection (options) {
+    return new TestLink({
+      host: 'localhost',
+      port: 80,
+      secure: false,
+      apiKey: '6bfa04dbfbc5463925786ef48d1793d4' // The API KEY from TestLink. Get it from user profile.
+    })
+  }
+
+  /**
+   * Creates a new test plan in TestLink
+   * @returns the id of the created plan
+   */
+  createTestPlan () {
+    // TODO implement the function
+    return 14
+  }
+
+  /**
    * Extracts TestLink ids of the form [XPJ-112]. A single case (title) may have several ids specified.
    * @param {string} title of the test case
+   * @returns {Array} of case ids
    */
   titleToCaseIds (title) {
     const caseIds = []
@@ -68,6 +86,7 @@ class TestLinkReporter extends mocha.reporters.Spec {
    * Generates the options for a TestLink case+steps that are mapped to mocha test suite+tests
    * @param {string} testcaseexternalid e.g. XPJ-112
    * @param {Suite} suite that is mapped to a TestLink test case
+   * @returns {object} with test suite options
    */
   suiteOptions (testcaseexternalid, suite) {
     // the suite is failed if any of its tests failed
@@ -90,6 +109,7 @@ class TestLinkReporter extends mocha.reporters.Spec {
    * @param {string} testcaseexternalid e.g. XPJ-112
    * @param {int} duration test.duration
    * @param {Error} err object
+   * @returns {object} with test case options
    */
   tcOptions (testcaseexternalid, duration, err) {
     const status = err ? ExecutionStatus.FAILED : ExecutionStatus.PASSED
