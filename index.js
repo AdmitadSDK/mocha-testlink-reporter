@@ -10,6 +10,9 @@ const {
   EVENT_TEST_PASS,
   EVENT_SUITE_END
 } = mocha.Runner.constants
+const {
+  STATE_PASSED
+} = mocha.Runnable.constants
 
 class TestLinkReporter extends mocha.reporters.Spec {
   constructor (runner, options) {
@@ -95,7 +98,7 @@ class TestLinkReporter extends mocha.reporters.Spec {
    */
   suiteOptions (testcaseexternalid, suite) {
     // the suite is failed if any of its tests failed
-    const status = suite.tests.some(t => t.state !== 'passed') ? ExecutionStatus.FAILED : ExecutionStatus.PASSED
+    const status = suite.tests.some(t => t.state !== STATE_PASSED) ? ExecutionStatus.FAILED : ExecutionStatus.PASSED
 
     // the sum total duration of the constituent tests
     const execduration = suite.tests.reduce((acc, t) => acc + t.duration, 0) / 60000
@@ -104,7 +107,7 @@ class TestLinkReporter extends mocha.reporters.Spec {
     const steps = suite.tests.map((t, idx) => {
       return {
         step_number: idx + 1,
-        result: t.state !== 'passed' ? ExecutionStatus.FAILED : ExecutionStatus.PASSED,
+        result: t.state !== STATE_PASSED ? ExecutionStatus.FAILED : ExecutionStatus.PASSED,
         notes: t.err ? t.err.stack : '' }
     })
 
