@@ -14,34 +14,37 @@ class TestLinkReporter extends mocha.reporters.Spec {
   constructor (runner, options) {
     super(runner, options)
 
-    const testlink = this.establishTestLinkConnection(options)
+    this.testlink = this.establishTestLinkConnection(options)
 
     this.buildid = 1
 
-    let promiseChain = testlink.checkDevKey().catch(console.error)
+    this.promiseChain = this.testlink.checkDevKey().catch(console.error)
 
     runner
       .once(EVENT_RUN_BEGIN, () => {
         this.testplanid = this.createTestPlan()
       })
-      .on(EVENT_SUITE_END, suite => {
-        for (const caseId of this.titleToCaseIds(suite.title)) {
-          const options = this.suiteOptions(caseId, suite)
-          promiseChain = promiseChain.then(() => testlink.reportTCResult(options)).catch(console.error)
-        }
-      })
-      .on(EVENT_TEST_PASS, test => {
-        for (const caseId of this.titleToCaseIds(test.title)) {
-          const options = this.tcOptions(caseId, test.duration)
-          promiseChain = promiseChain.then(() => testlink.reportTCResult(options)).catch(console.error)
-        }
-      })
-      .on(EVENT_TEST_FAIL, (test, err) => {
-        for (const caseId of this.titleToCaseIds(test.title)) {
-          const options = this.tcOptions(caseId, test.duration, err)
-          promiseChain = promiseChain.then(() => testlink.reportTCResult(options)).catch(console.error)
-        }
-      })
+      .on(EVENT_SUITE_END, suite =>
+        this.publishTestResults(suite, caseId => this.suiteOptions(caseId, suite))
+      )
+      .on(EVENT_TEST_PASS, test =>
+        this.publishTestResults(test, caseId => this.tcOptions(caseId, test.duration))
+      )
+      .on(EVENT_TEST_FAIL, (test, err) =>
+        this.publishTestResults(test, caseId => this.tcOptions(caseId, test.duration, err))
+      )
+  }
+
+  /**
+   * Extracts test status and publishes the result to TestLink.
+   * @param {Test|Suite} testObj with execution results
+   * @param {Function} optionsGen returns options based on caseId
+   */
+  publishTestResults (testObj, optionsGen) {
+    for (const caseId of this.titleToCaseIds(testObj.title)) {
+      const options = optionsGen(caseId)
+      this.promiseChain = this.promiseChain.then(() => this.testlink.reportTCResult(options)).catch(console.error)
+    }
   }
 
   /**
