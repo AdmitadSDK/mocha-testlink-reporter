@@ -53,6 +53,13 @@ class TestLinkReporter extends mocha.reporters.Spec {
       this.promiseChain = this.promiseChain
         .then(async () => {
           const options = optionsGen(caseId)
+
+          await this.testlink.addTestCaseToTestPlan({
+            testprojectid: this.testproject.id,
+            testplanid: this.testplanid,
+            testcaseexternalid: options.testcaseexternalid,
+            version: 1
+          })
           return this.testlink.reportTCResult(options)
         })
         .catch(console.error)
