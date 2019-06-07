@@ -89,8 +89,8 @@ class TestLinkReporter extends mocha.reporters.Spec {
   }
 
   /**
-   * Creates a new test plan in TestLink
-   * @returns the id of the created plan
+   * Creates a new test plan in TestLink and a build
+   * @param {object} options reporter options
    */
   createTestPlan (options) {
     if (options['testplanid']) {
@@ -113,6 +113,9 @@ class TestLinkReporter extends mocha.reporters.Spec {
           releasedate: ''
         })
         this.buildid = tbuild[0].id
+
+        const projects = await this.testlink.getProjects()
+        this.testproject = projects.find(p => p.prefix === options.prefix)
       }).catch(console.error)
     }
   }
