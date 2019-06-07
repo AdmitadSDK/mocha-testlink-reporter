@@ -89,7 +89,8 @@ class TestLinkReporter extends mocha.reporters.Spec {
       throw new Error('Missing --reporter-options')
     }
     if (!(options['testplanid'] && options['buildid']) && !(options['prefix'])) {
-      throw new Error('Either testplanid or prefix must be specified in --reporter-options')
+      throw new Error('Either a test project prefix or a testplan id' +
+        ' with build id must be specified in --reporter-options')
     }
     for (const opt of ['URL', 'apiKey']) {
       if (!options[opt]) {
@@ -108,11 +109,13 @@ class TestLinkReporter extends mocha.reporters.Spec {
       this.buildid = options.buildid
     } else {
       this.promiseChain = this.promiseChain.then(async () => {
+        const testplanname = `Automated test plan ${new Date().toISOString()}`
         const planRes = await this.testlink.createTestPlan({
-          testplanname: `Automated test plan ${new Date().toISOString()}`,
+          testplanname,
           prefix: options.prefix
         })
         this.testplanid = planRes[0].id
+        console.log(`A new test plan with id ${this.testplanid} was created in TestLink: ${testplanname}`)
 
         const buildRes = await this.testlink.createBuild({
           testplanid: this.testplanid,
