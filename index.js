@@ -51,8 +51,10 @@ class TestLinkReporter extends mocha.reporters.Spec {
   publishTestResults (title, optionsGen) {
     for (const caseId of this.titleToCaseIds(title)) {
       this.promiseChain = this.promiseChain
-        .then(() => optionsGen(caseId))
-        .then(options => this.testlink.reportTCResult(options))
+        .then(async () => {
+          const options = optionsGen(caseId)
+          return this.testlink.reportTCResult(options)
+        })
         .catch(console.error)
     }
   }
@@ -76,10 +78,10 @@ class TestLinkReporter extends mocha.reporters.Spec {
     if (!options) {
       throw new Error('Missing --reporter-options')
     }
-    if (!options['testplanid'] && !options['prefix']) {
+    if (!(options['testplanid'] && options['buildid']) && !(options['prefix'])) {
       throw new Error('Either testplanid or prefix must be specified in --reporter-options')
     }
-    for (const opt of ['URL', 'apiKey', 'buildid']) {
+    for (const opt of ['URL', 'apiKey']) {
       if (!options[opt]) {
         throw new Error(`Missing ${opt} option in --reporter-options`)
       }
@@ -95,20 +97,23 @@ class TestLinkReporter extends mocha.reporters.Spec {
       this.testplanid = options['testplanid']
       this.buildid = options.buildid
     } else {
-      const opts = { testplanname: `Automated test plan ${new Date().toISOString()}`, prefix: options.prefix }
-      this.promiseChain = this.promiseChain
-        .then(() => this.testlink.createTestPlan(opts))
-        .then(res => { this.testplanid = res[0].id })
-        .then(() => this.testlink.createBuild({
+      this.promiseChain = this.promiseChain.then(async () => {
+        const tplan = await this.testlink.createTestPlan({
+          testplanname: `Automated test plan ${new Date().toISOString()}`,
+          prefix: options.prefix
+        })
+        this.testplanid = tplan[0].id
+
+        const tbuild = await this.testlink.createBuild({
           testplanid: this.testplanid,
           buildname: 'automated build',
           buildnotes: '',
           active: true,
           open: true,
           releasedate: ''
-        }))
-        .then(res => { this.buildid = res[0].id })
-        .catch(console.error)
+        })
+        this.buildid = tbuild[0].id
+      }).catch(console.error)
     }
   }
 
