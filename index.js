@@ -23,8 +23,6 @@ class TestLinkReporter extends mocha.reporters.Spec {
 
     this.testlink = this.establishTestLinkConnection(reporterOptions)
 
-    this.buildid = reporterOptions.buildid
-
     // The chain is used to report test statuses in the order they become available during execution
     // An alternative would be to collect the statuses and publish them in one go at the end, but
     // they would be lost if the execution is aborted or the system crashes
@@ -95,11 +93,21 @@ class TestLinkReporter extends mocha.reporters.Spec {
   createTestPlan (options) {
     if (options['testplanid']) {
       this.testplanid = options['testplanid']
+      this.buildid = options.buildid
     } else {
       const opts = { testplanname: `Automated test plan ${new Date().toISOString()}`, prefix: options.prefix }
       this.promiseChain = this.promiseChain
         .then(() => this.testlink.createTestPlan(opts))
         .then(res => { this.testplanid = res[0].id })
+        .then(() => this.testlink.createBuild({
+          testplanid: this.testplanid,
+          buildname: 'automated build',
+          buildnotes: '',
+          active: true,
+          open: true,
+          releasedate: ''
+        }))
+        .then(res => { this.buildid = res[0].id })
         .catch(console.error)
     }
   }
