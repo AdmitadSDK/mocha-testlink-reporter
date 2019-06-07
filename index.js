@@ -45,6 +45,7 @@ class TestLinkReporter extends mocha.reporters.Spec {
 
   /**
    * Updates the TestLink status of each case id mentioned in the supplied title.
+   * Adds the tests to the test plan for newly created plans.
    * @param {string} title of the test to extract case ids from
    * @param {Function} optionsGen returns options based on caseId
    */
@@ -54,12 +55,14 @@ class TestLinkReporter extends mocha.reporters.Spec {
         .then(async () => {
           const options = optionsGen(caseId)
 
-          await this.testlink.addTestCaseToTestPlan({
-            testprojectid: this.testproject.id,
-            testplanid: this.testplanid,
-            testcaseexternalid: options.testcaseexternalid,
-            version: 1
-          })
+          if (this.testproject) { // add the case to the new test plan
+            await this.testlink.addTestCaseToTestPlan({
+              testprojectid: this.testproject.id,
+              testplanid: this.testplanid,
+              testcaseexternalid: options.testcaseexternalid,
+              version: 1
+            })
+          }
           return this.testlink.reportTCResult(options)
         })
         .catch(console.error)
@@ -105,13 +108,13 @@ class TestLinkReporter extends mocha.reporters.Spec {
       this.buildid = options.buildid
     } else {
       this.promiseChain = this.promiseChain.then(async () => {
-        const tplan = await this.testlink.createTestPlan({
+        const planRes = await this.testlink.createTestPlan({
           testplanname: `Automated test plan ${new Date().toISOString()}`,
           prefix: options.prefix
         })
-        this.testplanid = tplan[0].id
+        this.testplanid = planRes[0].id
 
-        const tbuild = await this.testlink.createBuild({
+        const buildRes = await this.testlink.createBuild({
           testplanid: this.testplanid,
           buildname: 'automated build',
           buildnotes: '',
@@ -119,7 +122,7 @@ class TestLinkReporter extends mocha.reporters.Spec {
           open: true,
           releasedate: ''
         })
-        this.buildid = tbuild[0].id
+        this.buildid = buildRes[0].id
 
         const projects = await this.testlink.getProjects()
         this.testproject = projects.find(p => p.prefix === options.prefix)
