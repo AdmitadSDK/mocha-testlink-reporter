@@ -19,9 +19,7 @@ class TestLinkReporter extends mocha.reporters.Spec {
     super(runner, options)
 
     const reporterOptions = options.reporterOptions
-    for (const opt of ['URL', 'apiKey', 'buildid']) {
-      this.validateReporterOption(reporterOptions, opt)
-    }
+    this.validateReporterOptions(reporterOptions)
 
     this.testlink = this.establishTestLinkConnection(reporterOptions)
 
@@ -34,7 +32,7 @@ class TestLinkReporter extends mocha.reporters.Spec {
 
     runner
       .once(EVENT_RUN_BEGIN, () => {
-        this.testplanid = this.createTestPlan()
+        this.createTestPlan(reporterOptions)
       })
       .on(EVENT_SUITE_END, suite =>
         this.publishTestResults(suite.title, caseId => this.suiteOptions(caseId, suite))
@@ -54,8 +52,10 @@ class TestLinkReporter extends mocha.reporters.Spec {
    */
   publishTestResults (title, optionsGen) {
     for (const caseId of this.titleToCaseIds(title)) {
-      const options = optionsGen(caseId)
-      this.promiseChain = this.promiseChain.then(() => this.testlink.reportTCResult(options)).catch(console.error)
+      this.promiseChain = this.promiseChain
+        .then(() => optionsGen(caseId))
+        .then(options => this.testlink.reportTCResult(options))
+        .catch(console.error)
     }
   }
 
@@ -74,12 +74,17 @@ class TestLinkReporter extends mocha.reporters.Spec {
     })
   }
 
-  validateReporterOption (options, name) {
+  validateReporterOptions (options) {
     if (!options) {
       throw new Error('Missing --reporter-options')
     }
-    if (!options[name]) {
-      throw new Error(`Missing ${name} option in --reporter-options`)
+    if (!options['testplanid'] && !options['prefix']) {
+      throw new Error('Either testplanid or prefix must be specified in --reporter-options')
+    }
+    for (const opt of ['URL', 'apiKey', 'buildid']) {
+      if (!options[opt]) {
+        throw new Error(`Missing ${opt} option in --reporter-options`)
+      }
     }
   }
 
@@ -87,9 +92,16 @@ class TestLinkReporter extends mocha.reporters.Spec {
    * Creates a new test plan in TestLink
    * @returns the id of the created plan
    */
-  createTestPlan () {
-    // TODO implement the function
-    return 14
+  createTestPlan (options) {
+    if (options['testplanid']) {
+      this.testplanid = options['testplanid']
+    } else {
+      const opts = { testplanname: `Automated test plan ${new Date().toISOString()}`, prefix: options.prefix }
+      this.promiseChain = this.promiseChain
+        .then(() => this.testlink.createTestPlan(opts))
+        .then(res => { this.testplanid = res[0].id })
+        .catch(console.error)
+    }
   }
 
   /**

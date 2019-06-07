@@ -15,8 +15,8 @@ describe('[XPJ-2] good stuff', function () {
 })
 
 describe('here comes santa', function () {
-  it('[XPJ-1] inside job', function () {
-
+  it('[XPJ-1] inside job', async function () {
+    await new Promise(resolve => setTimeout(resolve, 1000))
   })
 
   it('[XPJ-3] stranger in a strange land', function () {
