@@ -88,9 +88,17 @@ class TestLinkReporter extends mocha.reporters.Spec {
     if (!options) {
       throw new Error('Missing --reporter-options')
     }
-    if (!(options['testplanid'] && options['buildid']) && !(options['prefix'])) {
-      throw new Error('Either a test project prefix or a testplan id' +
-        ' with build id must be specified in --reporter-options')
+    if (!options['prefix']) {
+      if (!options['testplanid']) {
+        throw new Error('Please specify a testplanid in --reporter-options')
+      }
+      if (!(options['buildid'] || options['buildname'])) {
+        throw new Error('Please specify a buildid or a buildname in --reporter-options')
+      }
+    } else if (options['testplanname']) {
+      if (!(options['buildid'] || options['buildname'])) {
+        throw new Error('Please specify a buildid or a buildname in --reporter-options')
+      }
     }
     for (const opt of ['URL', 'apiKey']) {
       if (!options[opt]) {

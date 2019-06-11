@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha --reporter index.js --reporter-options URL=http://localhost,apiKey=6bfa04dbfbc5463925786ef48d1793d4,prefix=XPJ",
-    "test2": "mocha --reporter index.js --reporter-options URL=http://localhost,apiKey=6bfa04dbfbc5463925786ef48d1793d4,testplanid=14,buildid=1"
+    "testplanid": "mocha --reporter index.js --reporter-options URL=http://localhost,apiKey=6bfa04dbfbc5463925786ef48d1793d4,testplanid=14,buildid=1",
+    "testplanname": "mocha --reporter index.js --reporter-options URL=http://localhost,apiKey=6bfa04dbfbc5463925786ef48d1793d4,prefix=XPJ,testplanname=autoplan,buildname=autobuilld"
   },
   "repository": {
     "type": "git",
