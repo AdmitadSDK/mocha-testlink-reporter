@@ -31,6 +31,7 @@ class TestLinkReporter extends mocha.reporters.Spec {
     runner
       .once(EVENT_RUN_BEGIN, () => {
         this.createTestPlan(reporterOptions)
+        this.promiseChain = this.promiseChain.catch(console.error)
       })
       .on(EVENT_SUITE_END, suite =>
         this.publishTestResults(suite.title, caseId => this.suiteOptions(caseId, suite))
@@ -55,9 +56,9 @@ class TestLinkReporter extends mocha.reporters.Spec {
         .then(async () => {
           const options = optionsGen(caseId)
 
-          if (this.testproject) { // add the case to the new test plan
+          if (this.testProject) { // add the case to the new test plan
             await this.testlink.addTestCaseToTestPlan({
-              testprojectid: this.testproject.id,
+              testprojectid: this.testProject.id,
               testplanid: this.testplanid,
               testcaseexternalid: options.testcaseexternalid,
               version: 1
@@ -112,32 +113,61 @@ class TestLinkReporter extends mocha.reporters.Spec {
    * @param {object} options reporter options
    */
   createTestPlan (options) {
+    if (options['prefix']) {
+      this.promiseChain = this.promiseChain.then(async () => {
+        const projects = await this.testlink.getProjects()
+        this.testProject = projects.find(p => p.prefix === options.prefix)
+      })
+    }
+
     if (options['testplanid']) {
       this.testplanid = options['testplanid']
+    } else {
+      this.promiseChain = this.promiseChain.then(async () => {
+        const testplanname = options['testplanname'] ? options['testplanname'] : `autoplan ${new Date().toISOString()}`
+
+        const testPlans = await this.testlink.getProjectTestPlans({
+          testprojectid: this.testProject.id
+        })
+        let testPlan = Array.isArray(testPlans) && testPlans.find(p => p.name === testplanname)
+
+        if (!testPlan) {
+          const res = await this.testlink.createTestPlan({
+            testplanname,
+            prefix: options.prefix
+          })
+          testPlan = res[0]
+          console.log(`A new test plan '${testplanname}' with id ${testPlan.id} was created in TestLink`)
+        }
+        this.testplanid = testPlan.id
+      })
+    }
+
+    if (options['buildid']) {
       this.buildid = options.buildid
     } else {
       this.promiseChain = this.promiseChain.then(async () => {
-        const testplanname = `autoplan ${new Date().toISOString()}`
-        const planRes = await this.testlink.createTestPlan({
-          testplanname,
-          prefix: options.prefix
-        })
-        this.testplanid = planRes[0].id
-        console.log(`A new test plan with id ${this.testplanid} was created in TestLink: ${testplanname}`)
+        const buildname = options['buildname'] ? options['buildname'] : 'autobuild'
 
-        const buildRes = await this.testlink.createBuild({
-          testplanid: this.testplanid,
-          buildname: 'autobuild',
-          buildnotes: '',
-          active: true,
-          open: true,
-          releasedate: ''
+        const builds = await this.testlink.getBuildsForTestPlan({
+          testplanid: this.testplanid
         })
-        this.buildid = buildRes[0].id
+        let build = Array.isArray(builds) && builds.find(b => b.name === buildname)
 
-        const projects = await this.testlink.getProjects()
-        this.testproject = projects.find(p => p.prefix === options.prefix)
-      }).catch(console.error)
+        if (!build) {
+          const res = await this.testlink.createBuild({
+            testplanid: this.testplanid,
+            buildname,
+            buildnotes: '',
+            active: true,
+            open: true,
+            releasedate: ''
+          })
+          build = res[0]
+          console.log(`A new build '${buildname}' with id ${build.id} was created in TestLink`)
+        }
+        this.buildid = build.id
+      })
     }
   }
 
