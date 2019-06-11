@@ -13,12 +13,12 @@ If there is an existing test plan in TestRail that should be updated, then eithe
 Either `buildid` or `buildname` can be specified in either case. Here `prefix` is the test project prefix.
 
 ```shell
-$ mocha --reporter mocha-testlink-reporter --reporter-options URL=http://localhost,apiKey=1234567890,testplanid=7,buildid=2
+$ mocha --reporter mocha-testlink-reporter --reporter-options URL=http://localhost,apiKey=1234567890,prefix=XPJ,testplanid=7,buildid=2
 $ mocha --reporter mocha-testlink-reporter --reporter-options URL=http://localhost,apiKey=1234567890,prefix=XPJ,testplanname=autoplan,buildname=autobuilld
 ```
 
-To have new test plan created for each test execution, just specify the test project prefix.
-A plan named `autoplan <timestamp>` and a build named `autobuild` shall be created.
+If neither `testplanid` nor `testplanname` is specified, then a new test plan will be created with name `autoplan <timestamp>`.
+Similarly, if build information is omitted, a new one will be created with name `autobuild`.
 
 ```shell
 $ mocha --reporter mocha-testlink-reporter --reporter-options URL=http://localhost,apiKey=1234567890,prefix=XPJ

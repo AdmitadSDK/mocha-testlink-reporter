@@ -5,8 +5,11 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha --reporter index.js --reporter-options URL=http://localhost,apiKey=6bfa04dbfbc5463925786ef48d1793d4,prefix=XPJ",
-    "testplanid": "mocha --reporter index.js --reporter-options URL=http://localhost,apiKey=6bfa04dbfbc5463925786ef48d1793d4,testplanid=14,buildid=1",
-    "testplanname": "mocha --reporter index.js --reporter-options URL=http://localhost,apiKey=6bfa04dbfbc5463925786ef48d1793d4,prefix=XPJ,testplanname=autoplan,buildname=autobuilld"
+    "planid-buildid": "mocha --reporter index.js --reporter-options URL=http://localhost,apiKey=6bfa04dbfbc5463925786ef48d1793d4,prefix=XPJ,testplanid=14,buildid=1",
+    "planid-manbuild": "mocha --reporter index.js --reporter-options URL=http://localhost,apiKey=6bfa04dbfbc5463925786ef48d1793d4,prefix=XPJ,testplanid=14,buildname=manbuild",
+    "manplan-buildid": "mocha --reporter index.js --reporter-options URL=http://localhost,apiKey=6bfa04dbfbc5463925786ef48d1793d4,prefix=XPJ,testplanname=manplan,buildid=1",
+    "manplan-autobuild": "mocha --reporter index.js --reporter-options URL=http://localhost,apiKey=6bfa04dbfbc5463925786ef48d1793d4,prefix=XPJ,testplanname=manplan,buildname=autobuild",
+    "autoplan-autobuild": "mocha --reporter index.js --reporter-options URL=http://localhost,apiKey=6bfa04dbfbc5463925786ef48d1793d4,prefix=XPJ,testplanname=autoplan,buildname=autobuild"
   },
   "repository": {
     "type": "git",

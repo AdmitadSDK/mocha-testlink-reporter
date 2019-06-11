@@ -58,14 +58,12 @@ class TestLinkReporter extends mocha.reporters.Spec {
         .then(async () => {
           const options = optionsGen(caseId)
 
-          if (this.testProject) { // add the case to the new test plan
-            await this.testlink.addTestCaseToTestPlan({
-              testprojectid: this.testProject.id,
-              testplanid: this.testplanid,
-              testcaseexternalid: options.testcaseexternalid,
-              version: 1
-            })
-          }
+          await this.testlink.addTestCaseToTestPlan({
+            testprojectid: this.testProject.id,
+            testplanid: this.testplanid,
+            testcaseexternalid: options.testcaseexternalid,
+            version: 1
+          })
           return this.testlink.reportTCResult(options)
         })
         .catch(console.error)
@@ -91,22 +89,13 @@ class TestLinkReporter extends mocha.reporters.Spec {
     if (!options) {
       throw new Error('Missing --reporter-options')
     }
-    if (!options['prefix']) {
-      if (!options['testplanid']) {
-        throw new Error('Please specify a testplanid in --reporter-options')
-      }
-      if (!(options['buildid'] || options['buildname'])) {
-        throw new Error('Please specify a buildid or a buildname in --reporter-options')
-      }
-    } else if (options['testplanname']) {
-      if (!(options['buildid'] || options['buildname'])) {
-        throw new Error('Please specify a buildid or a buildname in --reporter-options')
-      }
-    }
-    for (const opt of ['URL', 'apiKey']) {
+    for (const opt of ['URL', 'apiKey', 'prefix']) {
       if (!options[opt]) {
         throw new Error(`Missing ${opt} option in --reporter-options`)
       }
+    }
+    if ((options['buildid'] || options['buildname']) && !(options['testplanid'] || options['testplanname'])) {
+      throw new Error('Please specify testplanid or testplanname in --reporter-options')
     }
   }
 
@@ -177,16 +166,14 @@ class TestLinkReporter extends mocha.reporters.Spec {
    * @param {object} options reporter options
    */
   lookupTestProject (options) {
-    if (options['prefix']) {
-      this.promiseChain = this.promiseChain.then(async () => {
-        const projects = await this.testlink.getProjects()
-        this.testProject = projects.find(p => p.prefix === options.prefix)
+    this.promiseChain = this.promiseChain.then(async () => {
+      const projects = await this.testlink.getProjects()
+      this.testProject = projects.find(p => p.prefix === options['prefix'])
 
-        if (!this.testProject) {
-          throw Error(`No project with prefix ${options['prefix']} was found`)
-        }
-      })
-    }
+      if (!this.testProject) {
+        throw Error(`No project with prefix ${options['prefix']} was found`)
+      }
+    })
   }
 
   /**
