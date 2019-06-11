@@ -9,13 +9,16 @@ $ npm install mocha-testlink-reporter
 ```
 ## Command line usage
 
-If there is an existing test plan in TestRail that needs to be updated, then use the following command
+If there is an existing test plan in TestRail that should be updated, then either specify its name or id as follows.
+Either `buildid` or `buildname` can be specified in either case. Here `prefix` is the test project prefix.
 
 ```shell
 $ mocha --reporter mocha-testlink-reporter --reporter-options URL=http://localhost,apiKey=1234567890,testplanid=7,buildid=2
+$ mocha --reporter mocha-testlink-reporter --reporter-options URL=http://localhost,apiKey=1234567890,prefix=XPJ,testplanname=autoplan,buildname=autobuilld
 ```
 
-Otherwise, just specify the test project prefix
+To have new test plan created for each test execution, just specify the test project prefix.
+A plan named `autoplan <timestamp>` and a build named `autobuild` shall be created.
 
 ```shell
 $ mocha --reporter mocha-testlink-reporter --reporter-options URL=http://localhost,apiKey=1234567890,prefix=XPJ

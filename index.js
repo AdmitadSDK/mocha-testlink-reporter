@@ -109,7 +109,7 @@ class TestLinkReporter extends mocha.reporters.Spec {
       this.buildid = options.buildid
     } else {
       this.promiseChain = this.promiseChain.then(async () => {
-        const testplanname = `Automated test plan ${new Date().toISOString()}`
+        const testplanname = `autoplan ${new Date().toISOString()}`
         const planRes = await this.testlink.createTestPlan({
           testplanname,
           prefix: options.prefix
@@ -119,7 +119,7 @@ class TestLinkReporter extends mocha.reporters.Spec {
 
         const buildRes = await this.testlink.createBuild({
           testplanid: this.testplanid,
-          buildname: 'automated build',
+          buildname: 'autobuild',
           buildnotes: '',
           active: true,
           open: true,
