@@ -30,7 +30,9 @@ class TestLinkReporter extends mocha.reporters.Spec {
 
     runner
       .once(EVENT_RUN_BEGIN, () => {
+        this.lookupTestProject(reporterOptions)
         this.createTestPlan(reporterOptions)
+        this.createBuild(reporterOptions)
         this.promiseChain = this.promiseChain.catch(console.error)
       })
       .on(EVENT_SUITE_END, suite =>
@@ -109,17 +111,10 @@ class TestLinkReporter extends mocha.reporters.Spec {
   }
 
   /**
-   * Creates a new test plan in TestLink and a build
+   * Creates a test plan if it doesn't exist.
    * @param {object} options reporter options
    */
   createTestPlan (options) {
-    if (options['prefix']) {
-      this.promiseChain = this.promiseChain.then(async () => {
-        const projects = await this.testlink.getProjects()
-        this.testProject = projects.find(p => p.prefix === options.prefix)
-      })
-    }
-
     if (options['testplanid']) {
       this.testplanid = options['testplanid']
     } else {
@@ -142,7 +137,13 @@ class TestLinkReporter extends mocha.reporters.Spec {
         this.testplanid = testPlan.id
       })
     }
+  }
 
+  /**
+   * Creates a build if it doesn't exist. Assumes that a test plan already exists
+   * @param {object} options reporter options
+   */
+  createBuild (options) {
     if (options['buildid']) {
       this.buildid = options.buildid
     } else {
@@ -167,6 +168,23 @@ class TestLinkReporter extends mocha.reporters.Spec {
           console.log(`A new build '${buildname}' with id ${build.id} was created in TestLink`)
         }
         this.buildid = build.id
+      })
+    }
+  }
+
+  /**
+   * Look up the test project from its prefix
+   * @param {object} options reporter options
+   */
+  lookupTestProject (options) {
+    if (options['prefix']) {
+      this.promiseChain = this.promiseChain.then(async () => {
+        const projects = await this.testlink.getProjects()
+        this.testProject = projects.find(p => p.prefix === options.prefix)
+
+        if (!this.testProject) {
+          throw Error(`No project with prefix ${options['prefix']} was found`)
+        }
       })
     }
   }
