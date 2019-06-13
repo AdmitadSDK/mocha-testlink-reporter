@@ -5,8 +5,12 @@ describe('[XPJ-2] good stuff', function () {
 
   })
 
-  it('invoke the devil', async function () {
+  it('invoke the devil', function () {
     throw Error('there be dragons here')
+  })
+
+  it('ignore me', function () {
+    this.skip()
   })
 
   it('but he may cry', async function () {

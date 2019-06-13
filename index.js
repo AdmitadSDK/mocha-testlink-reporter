@@ -199,8 +199,7 @@ class TestLinkReporter extends mocha.reporters.Spec {
    */
   suiteOptions (testcaseexternalid, suite) {
     // the suite is failed if any of its tests failed
-    const status = suite.tests.some(t => t.state !== STATE_PASSED) ? ExecutionStatus.FAILED : ExecutionStatus.PASSED
-
+    const status = suite.tests.some(t => t.isFailed()) ? ExecutionStatus.FAILED : ExecutionStatus.PASSED
     // the sum total duration of the constituent tests
     const execduration = suite.tests.reduce((acc, t) => acc + t.duration, 0) / 60000
 
@@ -208,7 +207,7 @@ class TestLinkReporter extends mocha.reporters.Spec {
     const steps = suite.tests.map((t, idx) => {
       return {
         step_number: idx + 1,
-        result: t.state !== STATE_PASSED ? ExecutionStatus.FAILED : ExecutionStatus.PASSED,
+        result: t.isPending() ? ExecutionStatus.NOT_RUN : (t.isPassed() ? ExecutionStatus.PASSED : ExecutionStatus.FAILED),
         notes: t.err ? t.err.stack : '' }
     })
 
