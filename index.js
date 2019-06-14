@@ -10,9 +10,6 @@ const {
   EVENT_TEST_PASS,
   EVENT_SUITE_END
 } = mocha.Runner.constants
-const {
-  STATE_PASSED
-} = mocha.Runnable.constants
 
 class TestLinkReporter extends mocha.reporters.Spec {
   constructor (runner, options) {
@@ -35,8 +32,8 @@ class TestLinkReporter extends mocha.reporters.Spec {
         this.createBuild(reporterOptions)
         this.promiseChain = this.promiseChain.catch(console.error)
       })
-      .on(EVENT_SUITE_END, suite =>
-        this.publishTestResults(suite.title, caseId => this.suiteOptions(caseId, suite))
+      .on(EVENT_SUITE_END, suite => // tests marked as skipped are ignored
+        !suite.isPending() && this.publishTestResults(suite.title, caseId => this.suiteOptions(caseId, suite))
       )
       .on(EVENT_TEST_PASS, test =>
         this.publishTestResults(test.title, caseId => this.tcOptions(caseId, test.duration))

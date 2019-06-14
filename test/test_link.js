@@ -18,6 +18,12 @@ describe('[XPJ-2] good stuff', function () {
   })
 })
 
+describe.skip('[XPJ-13] ignore me', function () {
+  it('there is nothing to look at', function () {
+
+  })
+})
+
 describe('here comes santa', function () {
   it('[XPJ-1] inside job', async function () {
     await new Promise(resolve => setTimeout(resolve, 1000))
