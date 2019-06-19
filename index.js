@@ -45,7 +45,7 @@ class TestLinkReporter extends mocha.reporters.Spec {
 
   /**
    * Updates the TestLink status of each case id mentioned in the supplied title.
-   * Adds the tests to the test plan for newly created plans.
+   * The latest active versions of the tests are added to the test plan.
    * @param {string} title of the test to extract case ids from
    * @param {Function} optionsGen returns options based on caseId
    */
@@ -54,17 +54,33 @@ class TestLinkReporter extends mocha.reporters.Spec {
       this.promiseChain = this.promiseChain
         .then(async () => {
           const options = optionsGen(caseId)
+          const version = await this.getLastActiveTestCaseVersion(options.testcaseexternalid)
 
           await this.testlink.addTestCaseToTestPlan({
             testprojectid: this.testProject.id,
             testplanid: this.testplanid,
             testcaseexternalid: options.testcaseexternalid,
-            version: 1
+            version
           })
           return this.testlink.reportTCResult(options)
         })
         .catch(console.error)
     }
+  }
+
+  /**
+   * @param {string} testcaseexternalid e.g. XPJ-1
+   * @returns {int} latest version of the test case that is in active state.
+   */
+  async getLastActiveTestCaseVersion (testcaseexternalid) {
+    let tc = await this.testlink.getTestCase({ testcaseexternalid })
+    let version = parseInt(tc[0].version)
+
+    while (version > 1 && tc[0].active !== '1') {
+      version--
+      tc = await this.testlink.getTestCase({ testcaseexternalid, version })
+    }
+    return version
   }
 
   /**
