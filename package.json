@@ -11,14 +11,14 @@
   },
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/AdmitadSDK/mocha-testlink-reporter.git"
   },
   "keywords": [
     "mocha",
     "testlink",
     "reporter"
   ],
-  "author": "Vaagn Khachatryan <v.khachatryan@admitad.com> (www.adtimad.com)",
+  "author": "Vaagn Khachatryan <v.khachatryan@admitad.com> (https://www.admitad.com/)",
   "license": "MIT",
   "devDependencies": {
     "eslint": "^5.16.0",
