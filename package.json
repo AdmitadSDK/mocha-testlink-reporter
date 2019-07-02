@@ -1,6 +1,6 @@
 {
   "name": "mocha-testlink-reporter",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "A custom mocha reporter for TestLink",
   "main": "index.js",
   "scripts": {
@@ -18,7 +18,7 @@
     "testlink",
     "reporter"
   ],
-  "author": "",
+  "author": "Vaagn Khachatryan <v.khachatryan@admitad.com> (www.adtimad.com)",
   "license": "MIT",
   "devDependencies": {
     "eslint": "^5.16.0",
