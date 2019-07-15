@@ -29,7 +29,9 @@
     "eslint-plugin-standard": "^4.0.0"
   },
   "dependencies": {
-    "mocha": "6.x",
-    "testlink-xmlrpc": "*"
+    "testlink-xmlrpc": "^1.9.18-5"
+  },
+  "peerDependencies": {
+    "mocha": "^6.1.4"
   }
 }
