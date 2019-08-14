@@ -9,20 +9,32 @@ $ npm install mocha-testlink-reporter
 ```
 ## Command line usage
 
-If there is an existing test plan in TestRail that should be updated, then either specify its name or id as follows.
-Either `buildid` or `buildname` can be specified in either case. Here `prefix` is the test project prefix.
+The reporter accepts the following options. They can be specified either through the command line or via the environment variables.
+Option | Environment | Required | Description
+------ | ----------- | -------- | -----------
+URL | TESTLINK_URL | yes | For example, http://localhost:8080
+apiKey | TESTLINK_API_KEY | yes | The API key of a TestLink user
+prefix | TESTLINK_PREFIX | yes | The test project prefix, for example, XPJ
+buildname | TESTLINK_BUILD | no | For example, autobuild
+buildid | TESTLINK_BUILD_ID | no | For example, 2
+testplanname | TESTLINK_PLAN | no | For example, autoplan
+testplanid | TESTLINK_PLAN_ID | no | For example, 7
+
+Example invocations from the command line
 
 ```shell
 $ mocha --reporter mocha-testlink-reporter --reporter-options URL=http://localhost,apiKey=1234567890,prefix=XPJ,testplanid=7,buildid=2
+
 $ mocha --reporter mocha-testlink-reporter --reporter-options URL=http://localhost,apiKey=1234567890,prefix=XPJ,testplanname=autoplan,buildname=autobuilld
+
+$ mocha --reporter mocha-testlink-reporter --reporter-options URL=http://localhost,apiKey=1234567890,prefix=XPJ
 ```
+
+If there is an existing test plan in TestRail that should be updated, then either specify its name or id.
+Either `buildid` or `buildname` can be specified in either case.
 
 If neither `testplanid` nor `testplanname` is specified, then a new test plan will be created with name `autoplan <timestamp>`.
 Similarly, if build information is omitted, a new one will be created with name `autobuild`.
-
-```shell
-$ mocha --reporter mocha-testlink-reporter --reporter-options URL=http://localhost,apiKey=1234567890,prefix=XPJ
-```
 
 ## Mapping the mocha tests to TestLink counterparts
 Mark the mocha test or suite descriptions with ID(s) of Testrail test cases in brackets.
