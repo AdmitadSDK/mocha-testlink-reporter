@@ -10,15 +10,16 @@ $ npm install mocha-testlink-reporter
 ## Command line usage
 
 The reporter accepts the following options. They can be specified either through the command line or via the environment variables.
-Option | Environment | Required | Description
------- | ----------- | -------- | -----------
-URL | TESTLINK_URL | yes | For example, http://localhost:8080
-apiKey | TESTLINK_API_KEY | yes | The API key of a TestLink user
-prefix | TESTLINK_PREFIX | yes | The test project prefix, for example, XPJ
-buildname | TESTLINK_BUILD | no | For example, autobuild
-buildid | TESTLINK_BUILD_ID | no | For example, 2
-testplanname | TESTLINK_PLAN | no | For example, autoplan
-testplanid | TESTLINK_PLAN_ID | no | For example, 7
+
+| Option | Environment | Required | Description |
+| ------ | ----------- | -------- | ----------- |
+| URL | TESTLINK_URL | yes | For example, http://localhost:8080 |
+| apiKey | TESTLINK_API_KEY | yes | The API key of a TestLink user |
+| prefix | TESTLINK_PREFIX | yes | The test project prefix, for example, XPJ |
+| buildname | TESTLINK_BUILD | no | For example, autobuild |
+| buildid | TESTLINK_BUILD_ID | no | For example, 2 |
+| testplanname | TESTLINK_PLAN | no | For example, autoplan |
+| testplanid | TESTLINK_PLAN_ID | no | For example, 7 |
 
 Example invocations from the command line
 
