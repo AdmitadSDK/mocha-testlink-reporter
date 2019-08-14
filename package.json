@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha --reporter index.js --reporter-options URL=http://localhost,apiKey=6bfa04dbfbc5463925786ef48d1793d4,prefix=XPJ",
+    "test-broken": "mocha --reporter index.js --reporter-options URL=http://localhost,apiKey=6bfa04dbfbc5463925786ef48d1793d4",
     "planid-buildid": "mocha --reporter index.js --reporter-options URL=http://localhost,apiKey=6bfa04dbfbc5463925786ef48d1793d4,prefix=XPJ,testplanid=14,buildid=1",
     "manplan-manbuild": "mocha --reporter index.js --reporter-options URL=http://localhost,apiKey=6bfa04dbfbc5463925786ef48d1793d4,prefix=XPJ,testplanname=manplan,buildname=manbuild",
     "autoplan-autobuild": "mocha --reporter index.js --reporter-options URL=http://localhost,apiKey=6bfa04dbfbc5463925786ef48d1793d4,prefix=XPJ,testplanname=autoplan,buildname=autobuild"

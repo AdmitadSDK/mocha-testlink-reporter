@@ -16,7 +16,10 @@ class TestLinkReporter extends mocha.reporters.Spec {
     super(runner, options)
 
     const reporterOptions = options.reporterOptions
-    this.validateReporterOptions(reporterOptions)
+    if (!this.parseReporterOptions(reporterOptions)) {
+      console.log('TestLink reporter is disabled due to insufficient configuration')
+      return
+    }
 
     this.testlink = this.establishTestLinkConnection(reporterOptions)
 
@@ -98,18 +101,37 @@ class TestLinkReporter extends mocha.reporters.Spec {
     })
   }
 
-  validateReporterOptions (options) {
-    if (!options) {
-      throw new Error('Missing --reporter-options')
-    }
+  /**
+   * Infers missing configuration options from the environment variables
+   * @param {object} [options] the reporter options
+   * @returns false if the configuration is incomplete
+   */
+  parseReporterOptions (options) {
+    options = options || {}
+
+    options.URL = options.URL || process.env.TESTLINK_URL
+    options.apiKey = options.apiKey || process.env.TESTLINK_API_KEY
+    options.prefix = options.prefix || process.env.TESTLINK_PREFIX
+
+    options.buildname = options.buildname || process.env.TESTLINK_BUILD
+    options.buildid = options.buildid || process.env.TESTLINK_BUILD_ID
+
+    options.testplanname = options.testplanname || process.env.TESTLINK_PLAN
+    options.testplanid = options.testplanid || process.env.TESTLINK_PLAN_ID
+
     for (const opt of ['URL', 'apiKey', 'prefix']) {
       if (!options[opt]) {
-        throw new Error(`Missing ${opt} option in --reporter-options`)
+        console.error(`Missing ${opt} option`)
+        return false
       }
     }
+
     if ((options['buildid'] || options['buildname']) && !(options['testplanid'] || options['testplanname'])) {
-      throw new Error('Please specify testplanid or testplanname in --reporter-options')
+      console.error('Missing testplanid or testplanname option')
+      return false
     }
+
+    return true
   }
 
   /**
