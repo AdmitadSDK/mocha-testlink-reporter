@@ -97,7 +97,8 @@ class TestLinkReporter extends mocha.reporters.Spec {
       host: url.hostname,
       port: url.port,
       secure: url.protocol === 'https:',
-      apiKey: options.apiKey
+      apiKey: options.apiKey,
+      rpcPath: url.pathname || '/lib/api/xmlrpc/v1/xmlrpc.php'
     })
   }
 
