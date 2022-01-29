@@ -13,7 +13,7 @@ The reporter accepts the following options. They can be specified either through
 
 | Option | Environment | Required | Description |
 | ------ | ----------- | -------- | ----------- |
-| URL | TESTLINK_URL | yes | For example, http://localhost:8080 |
+| URL | TESTLINK_URL | yes | For example, http://mytestlink.com:8080/lib/api/xmlrpc/v1/xmlrpc.php |
 | apiKey | TESTLINK_API_KEY | yes | The API key of a TestLink user |
 | prefix | TESTLINK_PREFIX | yes | The test project prefix, for example, XPJ |
 | buildname | TESTLINK_BUILD | no | For example, autobuild |
@@ -24,11 +24,11 @@ The reporter accepts the following options. They can be specified either through
 Example invocations from the command line
 
 ```shell
-$ mocha --reporter mocha-testlink-reporter --reporter-options URL=http://localhost,apiKey=1234567890,prefix=XPJ,testplanid=7,buildid=2
+$ mocha --reporter mocha-testlink-reporter --reporter-options URL=http://mytestlink.com/lib/api/xmlrpc/v1/xmlrpc.php,apiKey=1234567890,prefix=XPJ,testplanid=7,buildid=2
 
-$ mocha --reporter mocha-testlink-reporter --reporter-options URL=http://localhost,apiKey=1234567890,prefix=XPJ,testplanname=autoplan,buildname=autobuilld
+$ mocha --reporter mocha-testlink-reporter --reporter-options URL=http://mytestlink.com/lib/api/xmlrpc/v1/xmlrpc.php,apiKey=1234567890,prefix=XPJ,testplanname=autoplan,buildname=autobuilld
 
-$ mocha --reporter mocha-testlink-reporter --reporter-options URL=http://localhost,apiKey=1234567890,prefix=XPJ
+$ mocha --reporter mocha-testlink-reporter --reporter-options URL=http://mytestlink.com/lib/api/xmlrpc/v1/xmlrpc.php,apiKey=1234567890,prefix=XPJ
 ```
 
 If there is an existing test plan in TestRail that should be updated, then either specify its name or id.
