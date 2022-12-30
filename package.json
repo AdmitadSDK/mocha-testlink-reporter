@@ -22,7 +22,7 @@
   "author": "Vaagn Khachatryan <v.khachatryan@admitad.com> (https://www.admitad.com/)",
   "license": "MIT",
   "devDependencies": {
-    "mocha": "^6.2.0",
+    "mocha": "^10.2.0",
     "eslint": "^6.2.2",
     "eslint-config-standard": "^14.0.1",
     "eslint-plugin-import": "^2.18.2",
@@ -34,6 +34,6 @@
     "testlink-xmlrpc": "^1.9.18-5"
   },
   "peerDependencies": {
-    "mocha": "^6.2.0"
+    "mocha": "^10.2.0"
   }
 }
